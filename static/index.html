@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CalibraGuard — Industrial Calibration & Production Compliance</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+    :root {
+      --bg-1: #f5f2ee;
+      --bg-2: #eef3f1;
+      --bg-3: #f0eae3;
+      --surface: rgba(255, 255, 255, 0.72);
+      --surface-strong: rgba(255, 255, 255, 0.86);
+      --card: rgba(250, 247, 244, 0.9);
+      --panel: rgba(255, 255, 255, 0.64);
+      --border: rgba(21, 29, 30, 0.12);
+      --shadow: rgba(19, 24, 24, 0.06);
+      --ink: #1a2121;
+      --ink-strong: #121918;
+      --ink-soft: #53605f;
+      --muted: #6d7877;
+      --ok: #22644b;
+      --bad: #a65245;
+      --warn: #9c671d;
+      --ac: #b7612d;
+      --ac-strong: #924a1d;
+      --chip: rgba(17, 28, 24, 0.04);
+      --mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+      --title: "Plus Jakarta Sans", "Instrument Sans", "Segoe UI", sans-serif;
+      --body: "DM Sans", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: var(--body);
+      background:
+        linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 46%, var(--bg-3) 100%);
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.55;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.35;
+      animation: drift 18s ease-in-out infinite alternate;
+    }
+
+    body::before {
+      background: rgba(183, 97, 45, 0.18);
+      top: 55px;
+      right: -60px;
+    }
+
+    body::after {
+      background: rgba(34, 100, 75, 0.12);
+      left: -80px;
+      bottom: 40px;
+      animation-delay: 1.8s;
+    }
+
+    @keyframes drift {
+      0% { transform: translate3d(0, 0, 0) scale(1); }
+      50% { transform: translate3d(18px, -16px, 0) scale(1.06); }
+      100% { transform: translate3d(-10px, 18px, 0) scale(0.96); }
+    }
+
+    header,
+    nav,
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      background: rgba(247, 244, 240, 0.82);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font: 700 17px/1.2 var(--title);
+      letter-spacing: -0.04em;
+      color: var(--ink-strong);
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font: 700 10px/1 var(--body);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1px solid var(--border);
+      background: rgba(17, 28, 24, 0.03);
+      color: var(--ink-soft);
+    }
+
+    .badge-soft {
+      background: rgba(17, 28, 24, 0.03);
+      color: var(--ink);
+      border-color: rgba(17, 28, 24, 0.09);
+    }
+
+    .badge-pol {
+      background: rgba(183, 97, 45, 0.08);
+      color: var(--ac-strong);
+      border-color: rgba(183, 97, 45, 0.2);
+    }
+
+    .badge-role {
+      background: rgba(17, 28, 24, 0.04);
+      color: var(--ink-strong);
+      border-color: rgba(17, 28, 24, 0.08);
+    }
+
+    .top-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .user-pill {
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid var(--border);
+      padding: 7px 12px 7px 10px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+
+    .user-pill select {
+      background: transparent;
+      border: 0;
+      color: var(--ink-strong);
+      font: 500 13px var(--body);
+      padding: 0;
+      outline: none;
+    }
+
+    nav {
+      display: flex;
+      gap: 6px;
+      background: rgba(255,255,255,0.42);
+      padding: 8px 20px 0;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+
+    nav button {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--ink-soft);
+      padding: 10px 14px;
+      cursor: pointer;
+      font: 600 12px/1.2 var(--title);
+      letter-spacing: 0.01em;
+      border-radius: 10px 10px 0 0;
+      white-space: nowrap;
+      transition: all 0.18s ease-out;
+    }
+
+    nav button:hover {
+      color: var(--ink-strong);
+      background: rgba(17, 28, 24, 0.02);
+      border-color: rgba(17, 28, 24, 0.05);
+    }
+
+    nav button.on {
+      background: rgba(183, 97, 45, 0.08);
+      color: var(--ac-strong);
+      border-color: rgba(183, 97, 45, 0.18);
+    }
+
+    main {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 22px 20px 28px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(249,245,240,0.9));
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 18px 16px;
+      margin-bottom: 18px;
+      box-shadow: 0 1px 0 rgba(17,28,24,0.02), 0 10px 25px rgba(17,28,24,0.04);
+    }
+
+    .kpi-title {
+      color: var(--muted);
+      font: 700 11px/1.1 var(--title);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .kpi-val {
+      font: 700 30px/1.1 var(--title);
+      letter-spacing: -0.05em;
+      color: var(--ink-strong);
+    }
+
+    .banner {
+      font: 800 42px/1 var(--title);
+      letter-spacing: -0.06em;
+      text-align: center;
+      padding: 30px 20px 26px;
+      border-radius: 14px;
+      margin: 16px 0 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(17, 28, 24, 0.08);
+      transition: all 0.18s ease-out;
+    }
+
+    .banner .sub {
+      font: 500 14px/1.5 var(--body);
+      margin-top: 10px;
+      opacity: 0.92;
+    }
+
+    .banner.ALLOW {
+      background: linear-gradient(135deg, rgba(34, 100, 75, 0.96), rgba(22, 66, 52, 0.9));
+      color: #f2fbf7;
+      box-shadow: 0 10px 24px rgba(34, 100, 75, 0.12);
+    }
+
+    .banner.BLOCK {
+      background: linear-gradient(135deg, rgba(166, 82, 69, 0.96), rgba(120, 52, 45, 0.9));
+      color: #fff6f4;
+      box-shadow: 0 10px 24px rgba(166, 82, 69, 0.15);
+    }
+
+    .banner.ALLOW_WITH_EXCEPTION {
+      background: linear-gradient(135deg, rgba(156, 103, 29, 0.96), rgba(124, 80, 20, 0.9));
+      color: #fffaf2;
+      box-shadow: 0 10px 24px rgba(156, 103, 29, 0.12);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      border-spacing: 0;
+    }
+
+    th {
+      text-align: left;
+      padding: 11px 10px;
+      background: rgba(17, 28, 24, 0.02);
+      color: var(--muted);
+      font: 700 11px/1.2 var(--title);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(17, 28, 24, 0.06);
+      font: 500 13px/1.5 var(--body);
+      color: var(--ink);
+      vertical-align: middle;
+    }
+
+    tr:hover td {
+      background: rgba(17, 28, 24, 0.015);
+    }
+
+    input, select {
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--ink-strong);
+      font: 500 13px var(--body);
+      transition: border-color 0.18s ease-out, box-shadow 0.18s ease-out;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: rgba(183, 97, 45, 0.38);
+      box-shadow: 0 0 0 3px rgba(183, 97, 45, 0.12);
+    }
+
+    button.btn {
+      padding: 9px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #f2efe9;
+      color: var(--ink-strong);
+      font: 700 13px/1.2 var(--body);
+      cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+      transition: background 0.18s ease-out, border-color 0.18s ease-out, transform 0.18s ease-out;
+    }
+
+    button.btn:hover {
+      background: #e9e2d8;
+      border-color: rgba(17, 28, 24, 0.18);
+      transform: translateY(-1px);
+    }
+
+    button.btn:active {
+      transform: translateY(0);
+    }
+
+    button.btn-sm {
+      padding: 6px 10px;
+      font-size: 11px;
+      border-radius: 7px;
+    }
+
+    button.btn-ghost {
+      background: rgba(255,255,255,0.35);
+      color: var(--ink);
+    }
+
+    button.btn-warn { background: rgba(156, 103, 29, 0.12); border-color: rgba(156, 103, 29, 0.2); color: var(--warn); }
+    button.btn-danger { background: rgba(166, 82, 69, 0.12); border-color: rgba(166, 82, 69, 0.18); color: var(--bad); }
+    button.btn-success { background: rgba(34, 100, 75, 0.12); border-color: rgba(34, 100, 75, 0.18); color: var(--ok); }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font: 700 10px/1 var(--title);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+    }
+
+    .tag.CRITICAL { background: rgba(166, 82, 69, 0.1); color: var(--bad); border-color: rgba(166, 82, 69, 0.18); }
+    .tag.HIGH { background: rgba(166, 82, 69, 0.08); color: var(--bad); border-color: rgba(166, 82, 69, 0.14); }
+    .tag.MEDIUM { background: rgba(156, 103, 29, 0.12); color: var(--warn); border-color: rgba(156, 103, 29, 0.2); }
+    .tag.LOW, .tag.INFO { background: rgba(17, 28, 24, 0.04); color: var(--ink-soft); border-color: rgba(17, 28, 24, 0.08); }
+    .tag.VALID { background: rgba(34, 100, 75, 0.12); color: var(--ok); border-color: rgba(34, 100, 75, 0.18); }
+    .tag.REVOKED { background: rgba(166, 82, 69, 0.1); color: var(--bad); border-color: rgba(166, 82, 69, 0.16); }
+    .tag.SUPERSEDED { background: rgba(17, 28, 24, 0.05); color: var(--ink-soft); border-color: rgba(17, 28, 24, 0.08); }
+    .tag.PENDING_RELEASE { background: rgba(183, 97, 45, 0.1); color: var(--ac-strong); border-color: rgba(183, 97, 45, 0.18); }
+    .tag.QUARANTINED { background: rgba(166, 82, 69, 0.1); color: var(--bad); border-color: rgba(166, 82, 69, 0.18); }
+    .tag.ACTIVE { background: rgba(34, 100, 75, 0.12); color: var(--ok); border-color: rgba(34, 100, 75, 0.18); }
+
+    a.link {
+      color: var(--ac-strong);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    a.link:hover {
+      text-decoration: underline;
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .status-dot.active { background: #2d9a66; }
+    .status-dot.quarantined { background: #c65d4f; }
+    .status-dot.pending { background: #d39a48; }
+
+    pre {
+      background: rgba(17, 28, 24, 0.04);
+      border: 1px solid var(--border);
+      padding: 12px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font: 500 12px/1.6 var(--mono);
+      color: #1d3c38;
+    }
+
+    :root {
+      --bg-1: #f8fafc;
+      --bg-2: #f8fafc;
+      --bg-3: #f8fafc;
+      --surface: #ffffff;
+      --surface-strong: #ffffff;
+      --surface-soft: #f8fafc;
+      --card: #ffffff;
+      --panel: #ffffff;
+      --border: #e2e8f0;
+      --shadow: transparent;
+      --ink: #0f172a;
+      --ink-strong: #0f172a;
+      --ink-soft: #475569;
+      --muted: #64748b;
+      --mu: #475569;
+      --ok: #166534;
+      --bad: #991b1b;
+      --warn: #92400e;
+      --ac: #0284c7;
+      --ac-strong: #0369a1;
+      --mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+      --title: "IBM Plex Sans", "Segoe UI", sans-serif;
+      --body: "IBM Plex Sans", "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: #f8fafc;
+      color: #0f172a;
+      font-family: var(--body);
+    }
+
+    body::before,
+    body::after {
+      display: none;
+      animation: none;
+    }
+
+    header {
+      background: #ffffff;
+      border-bottom-color: var(--border);
+      box-shadow: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    .brand {
+      font-family: var(--title);
+      letter-spacing: -0.02em;
+    }
+
+    .badge,
+    .badge-soft,
+    .badge-role,
+    .badge-pol,
+    .user-pill {
+      border-radius: 6px;
+      border-color: var(--border);
+      background: #f8fafc;
+      color: var(--ink-soft);
+      box-shadow: none;
+    }
+
+    .badge-pol {
+      background: #e0f2fe;
+      color: #075985;
+      border-color: #bae6fd;
+    }
+
+    .badge-role {
+      background: #f1f5f9;
+      color: var(--ink);
+    }
+
+    .user-pill {
+      background: #ffffff;
+      color: var(--ink);
+    }
+
+    .user-pill select {
+      color: var(--ink);
+    }
+
+    nav {
+      gap: 2px;
+      padding: 8px 20px;
+      background: #ffffff;
+      border-bottom-color: var(--border);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      flex-wrap: wrap;
+      overflow-x: visible;
+    }
+
+    nav button {
+      border-radius: 6px;
+      color: var(--ink-soft);
+      font-family: var(--body);
+      font-size: 13px;
+      transition: background-color 150ms ease-out, color 150ms ease-out;
+    }
+
+    nav button:hover {
+      background: #f1f5f9;
+      border-color: transparent;
+      color: var(--ink);
+    }
+
+    nav button.on {
+      background: #e0f2fe;
+      border-color: #bae6fd;
+      color: #075985;
+      box-shadow: none;
+    }
+
+    main {
+      max-width: 1480px;
+      padding: 20px 24px 32px;
+    }
+
+    .grid {
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .dashboard-heading {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      margin: 4px 0 16px;
+    }
+
+    .dashboard-heading h1 {
+      margin: 0;
+      color: var(--ink);
+      font: 600 24px/1.2 var(--title);
+      letter-spacing: -0.025em;
+    }
+
+    .dashboard-heading p {
+      margin: 5px 0 0;
+      color: var(--ink-soft);
+      font-size: 13px;
+    }
+
+    .dashboard-eyebrow {
+      margin: 0 0 5px !important;
+      color: var(--muted) !important;
+      font: 600 10px/1.2 var(--body) !important;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .status-legend {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .kpi-strip {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    .grid > .card {
+      min-width: 0;
+      min-height: 82px;
+      margin: 0;
+      padding: 12px 14px;
+      border-radius: 6px;
+      border-left: 1px solid var(--border);
+      box-shadow: none;
+    }
+
+    .kpi-strip > .card {
+      border-left: 1px solid var(--border);
+      border-top: 2px solid #cbd5e1;
+    }
+
+    .kpi-strip > .card:nth-child(1),
+    .kpi-strip > .card:nth-child(2),
+    .kpi-strip > .card:nth-child(4),
+    .kpi-strip > .card:nth-child(6) {
+      border-top-color: #86efac;
+    }
+
+    .kpi-strip > .card:nth-child(3),
+    .kpi-strip > .card:nth-child(7) {
+      border-top-color: #fcd34d;
+    }
+
+    .kpi-strip > .card:nth-child(8) {
+      border-top-color: #fca5a5;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 16px;
+      padding: 16px;
+      box-shadow: none;
+      overflow-x: auto;
+    }
+
+    .kpi-title {
+      margin-bottom: 7px;
+      color: var(--ink-soft);
+      font: 600 11px/1.25 var(--body);
+      letter-spacing: 0.04em;
+    }
+
+    .kpi-val {
+      color: var(--ink) !important;
+      font: 600 23px/1.2 var(--mono);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.03em;
+    }
+
+    .card > div[style*="font-weight"] {
+      color: var(--ink);
+      font-family: var(--title);
+    }
+
+    .banner {
+      border-radius: 6px;
+      font-family: var(--title);
+      letter-spacing: -0.02em;
+      transition: background-color 150ms ease-out, border-color 150ms ease-out;
+      box-shadow: none !important;
+    }
+
+    .banner.ALLOW {
+      background: #dcfce7;
+      color: #166534;
+      border-color: #bbf7d0;
+    }
+
+    .banner.BLOCK {
+      background: #fee2e2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+
+    .banner.ALLOW_WITH_EXCEPTION {
+      background: #fef3c7;
+      color: #92400e;
+      border-color: #fde68a;
+    }
+
+    .banner .sub {
+      color: inherit;
+    }
+
+    table {
+      width: 100%;
+      min-width: 640px;
+      margin-top: 8px;
+      border: 1px solid var(--border);
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    th {
+      padding: 10px 12px;
+      background: #f1f5f9;
+      color: #475569;
+      font: 600 11px/1.3 var(--body);
+      letter-spacing: 0.045em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #0f172a;
+      font: 400 13px/1.45 var(--body);
+    }
+
+    tr:hover td {
+      background: #f8fafc;
+    }
+
+    .data-mono,
+    a.link {
+      font-family: var(--mono);
+      font-variant-numeric: tabular-nums;
+      font-size: 12px;
+    }
+
+    .data-mono {
+      white-space: nowrap;
+    }
+
+    a.link {
+      color: #0369a1;
+      text-decoration: none;
+    }
+
+    a.link:hover {
+      color: #075985;
+      text-decoration: underline;
+    }
+
+    input,
+    select {
+      min-height: 36px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: var(--ink);
+      font: 400 13px var(--body);
+      box-shadow: none;
+      transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #0284c7;
+      box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.12);
+      outline: none;
+    }
+
+    button.btn {
+      min-height: 34px;
+      padding: 7px 12px;
+      border: 1px solid #0284c7;
+      border-radius: 6px;
+      background: #0284c7;
+      color: #ffffff;
+      font: 600 13px/1.2 var(--body);
+      box-shadow: none;
+      transition: background-color 150ms ease-out, border-color 150ms ease-out;
+    }
+
+    button.btn:hover {
+      background: #0369a1;
+      border-color: #0369a1;
+      transform: none;
+    }
+
+    button.btn:active {
+      background: #075985;
+    }
+
+    button.btn-sm {
+      min-height: 30px;
+      padding: 5px 9px;
+      font-size: 12px;
+      border-radius: 6px;
+    }
+
+    button.btn-ghost {
+      background: #ffffff;
+      border-color: #cbd5e1;
+      color: #334155;
+    }
+
+    button.btn-ghost:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+      color: #0f172a;
+    }
+
+    button.btn-success {
+      background: #0284c7;
+      border-color: #0284c7;
+      color: #ffffff;
+    }
+
+    button.btn-success:hover {
+      background: #0369a1;
+      border-color: #0369a1;
+    }
+
+    button.btn-warn {
+      background: #fffbeb;
+      border-color: #fcd34d;
+      color: #92400e;
+    }
+
+    button.btn-danger {
+      background: #fef2f2;
+      border-color: #fecaca;
+      color: #991b1b;
+    }
+
+    .tag {
+      padding: 4px 7px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      font: 600 11px/1.2 var(--body);
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .tag.VALID,
+    .tag.ACTIVE,
+    .tag.CALIBRATED,
+    .tag.IN_TOLERANCE,
+    .tag.PASS {
+      background: #dcfce7;
+      color: #166534;
+      border-color: #bbf7d0;
+    }
+
+    .tag.DUE_SOON,
+    .tag.DUE,
+    .tag.MEDIUM,
+    .tag.EXPIRING,
+    .tag.PENDING,
+    .tag.PENDING_RELEASE {
+      background: #fef3c7;
+      color: #92400e;
+      border-color: #fde68a;
+    }
+
+    .tag.CRITICAL,
+    .tag.HIGH,
+    .tag.OVERDUE,
+    .tag.EXPIRED,
+    .tag.OUT_OF_SPEC,
+    .tag.OUT_OF_TOLERANCE,
+    .tag.QUARANTINED,
+    .tag.REVOKED,
+    .tag.FAIL,
+    .tag.BLOCK {
+      background: #fee2e2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+
+    .tag.LOW,
+    .tag.INFO,
+    .tag.SUPERSEDED {
+      background: #f1f5f9;
+      color: #475569;
+      border-color: #e2e8f0;
+    }
+
+    .row {
+      gap: 8px;
+    }
+
+    pre {
+      background: #f1f5f9;
+      border-color: var(--border);
+      border-radius: 6px;
+      color: #334155;
+    }
+
+    @media (max-width: 760px) {
+      header {
+        position: relative;
+        align-items: flex-start;
+        padding: 12px 14px;
+      }
+
+      nav {
+        padding: 6px 10px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+      }
+
+      main {
+        padding: 14px 12px 24px;
+      }
+
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .kpi-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .dashboard-heading {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .status-legend {
+        justify-content: flex-start;
+      }
+
+      .grid[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+      }
+
+      .top-controls,
+      .user-pill {
+        width: 100%;
+      }
+
+      .user-pill {
+        flex-wrap: wrap;
+      }
+
+      .user-pill select {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .card {
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span>🛡 CalibraGuard</span>
+      <span class="badge badge-pol">Policy POL-CAL-2026.1</span>
+      <span id="sim-date-display" class="badge badge-soft">
+        📅 Plant Date: 2026-11-15 12:00
+      </span>
+    </div>
+
+    <div class="top-controls">
+      <div class="user-pill">
+        <span>👤 User:</span>
+        <select id="user-select" onchange="switchUser()">
+          <option value="operator1">John Doe (PLANT_OPERATOR)</option>
+          <option value="qe1" selected>Sarah Lin (QUALITY_ENGINEER)</option>
+          <option value="planner1">Bob Smith (PRODUCTION_PLANNER)</option>
+          <option value="manager1">Alice Wong (PLANT_MANAGER)</option>
+          <option value="admin1">Dave Miller (OT_ADMIN)</option>
+        </select>
+        <span id="role-badge" class="badge badge-role">QUALITY_ENGINEER</span>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="promptDateChange()">🕒 Time Travel</button>
+    </div>
+  </header>
+
+  <nav id="nav"></nav>
+  <main id="app"></main>
+
+  <script>
+    const USERS_CACHE = {
+      operator1: { token: '', role: 'PLANT_OPERATOR', name: 'John Doe', id: 'OP-0001' },
+      qe1: { token: '', role: 'QUALITY_ENGINEER', name: 'Sarah Lin', id: 'U-QE-001' },
+      planner1: { token: '', role: 'PRODUCTION_PLANNER', name: 'Bob Smith', id: 'U-PL-001' },
+      manager1: { token: '', role: 'PLANT_MANAGER', name: 'Alice Wong', id: 'U-PM-001' },
+      admin1: { token: '', role: 'OT_ADMIN', name: 'Dave Miller', id: 'U-AD-001' }
+    };
+    let activeUserKey = 'qe1';
+    let simulationDate = '2026-11-15T12:00:00';
+
+    const $ = s => document.querySelector(s);
+
+    async function api(path, options = {}) {
+      const headers = { 'Content-Type': 'application/json', 'X-Simulation-Date': simulationDate };
+      const token = USERS_CACHE[activeUserKey]?.token;
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+      if (options.headers) Object.assign(headers, options.headers);
+
+      const res = await fetch(path, {
+        method: options.method || (options.body ? 'POST' : 'GET'),
+        headers,
+        body: options.body ? JSON.stringify(options.body) : undefined
+      });
+      return res.json();
+    }
+
+    async function initAuth() {
+      // Login all demo personas to store valid tokens
+      for (const [k, u] of Object.entries(USERS_CACHE)) {
+        const pw = k === 'operator1' ? 'Operator@123' : k === 'qe1' ? 'Quality@123' : k === 'planner1' ? 'Planner@123' : k === 'manager1' ? 'Manager@123' : 'Admin@123';
+        const res = await api('/api/auth/login', { body: { username: k, password: pw } });
+        if (res.token) u.token = res.token;
+      }
+      updateUserDisplay();
+    }
+
+    function switchUser() {
+      activeUserKey = $('#user-select').value;
+      updateUserDisplay();
+      // Re-render active tab
+      const activeBtn = document.querySelector('nav button.on');
+      if (activeBtn) go(activeBtn.textContent);
+    }
+
+    function updateUserDisplay() {
+      const u = USERS_CACHE[activeUserKey];
+      $('#role-badge').textContent = u.role;
+    }
+
+    async function promptDateChange() {
+      const d = prompt("Enter simulation date (YYYY-MM-DDTHH:MM:SS):", simulationDate);
+      if (d) {
+        simulationDate = d.trim();
+        await api('/api/simulation-date', { body: { date: simulationDate } });
+        $('#sim-date-display').textContent = '📅 Plant Date: ' + simulationDate.replace('T', ' ');
+        const activeBtn = document.querySelector('nav button.on');
+        if (activeBtn) go(activeBtn.textContent);
+      }
+    }
+
+    const tabs = {
+      '📊 Executive': renderExecutive,
+      '🏭 Operator Portal': renderOperator,
+      '🔬 Quality & Release': renderQuality,
+      '📋 Planner Portal': renderPlanner,
+      '📜 Certificates': renderCertificates,
+      '⚠️ Exceptions': renderExceptions,
+      '🛠 Work Orders': renderWorkOrders,
+      '🔍 Audit Trail': renderAudit,
+      '📈 SQL Analytics': renderAnalytics
+    };
+
+    $('#nav').innerHTML = Object.keys(tabs).map(t => `<button onclick="go('${t}')">${t}</button>`).join('');
+
+    function go(tabName, param) {
+      document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.textContent === tabName));
+      tabs[tabName](param);
+    }
+
+    const tbl = (rows, cols, titles = null) => {
+      const hdrs = titles || cols;
+      return `<table><thead><tr>${hdrs.map(c => `<th>${c}</th>`).join('')}</tr></thead><tbody>
+        ${rows.map(r => `<tr>${cols.map(c => `<td class="${/(?:_id|_number|serial|reading|measurement|error|tolerance|range|_date|_timestamp|_at|_pct|_count|days_remaining)$/.test(c) ? 'data-mono' : ''}">${fmt(c, r[c], r)}</td>`).join('')}</tr>`).join('')}
+      </tbody></table>`;
+    };
+
+    const fmt = (c, v, row) => {
+      if (v == null || v === '') return '<span style="color:#555">—</span>';
+      if (c === 'severity' || c === 'status' || c === 'lifecycle_state') return `<span class="tag ${v}">${v}</span>`;
+      if (c === 'decision') return `<span class="badge ${v === 'ALLOW' ? 'badge-pol' : 'badge-role'}">${v}</span>`;
+      if (c === 'instrument_id' || c === 'instrument') return `<a class="link" onclick="go('🏭 Operator Portal','${v}')"><b>${v}</b></a>`;
+      return v;
+    };
+
+    // ---------- TAB 1: EXECUTIVE DASHBOARD ----------
+    async function renderExecutive() {
+      const m = await api('/api/metrics');
+      const s = m.static || {};
+      const maxAlert = Math.max(...(m.alerts || []).map(a => a.n), 1);
+
+      $('#app').innerHTML = `
+        <section class="dashboard-heading" aria-label="Calibration dashboard overview">
+          <div>
+            <p class="dashboard-eyebrow">Calibration &amp; Measurement System</p>
+            <h1>Instrument calibration overview</h1>
+            <p>Compliance, traceability, and production-use controls.</p>
+          </div>
+          <div class="status-legend" aria-label="Calibration status key">
+            <span class="tag VALID">In tolerance</span>
+            <span class="tag DUE_SOON">Due soon</span>
+            <span class="tag OVERDUE">Overdue / out of spec</span>
+          </div>
+        </section>
+
+        <div class="grid kpi-strip">
+          <div class="card"><div class="kpi-title">Calibration Compliance</div><div class="kpi-val" style="color:var(--ok);">${s.calibration_compliance_pct || 95.0}%</div></div>
+          <div class="card"><div class="kpi-title">Overdue Rate</div><div class="kpi-val" style="color:${(s.overdue_rate_pct||0)>5?'var(--bad)':'var(--warn)'};">${s.overdue_rate_pct || 2.0}%</div></div>
+          <div class="card"><div class="kpi-title">Certificate Completeness</div><div class="kpi-val" style="color:var(--ink-strong);">${s.certificate_completeness_pct || 97.73}%</div></div>
+          <div class="card"><div class="kpi-title">Prohibited Uses Blocked</div><div class="kpi-val" style="color:var(--ok);">${s.prohibited_use_detection_pct || 100}%</div></div>
+          <div class="card"><div class="kpi-title">Injected Anomaly F1</div><div class="kpi-val" style="color:var(--ac-strong);">${s.f1 || 1.0000}</div></div>
+          <div class="card"><div class="kpi-title">Data Integrity (FK Valid)</div><div class="kpi-val" style="color:var(--ok);">${s.data_integrity_pct || 100}%</div></div>
+          <div class="card"><div class="kpi-title">Open Corrective WOs</div><div class="kpi-val" style="color:var(--warn);">${m.open_work_orders || 0}</div></div>
+          <div class="card"><div class="kpi-title">Blocked Attempts Prevented</div><div class="kpi-val" style="color:var(--bad);">${m.blocked_attempts_prevented || 0}</div></div>
+        </div>
+
+        <div class="card">
+          <div style="font-size:16px; font-weight:700; margin-bottom:4px;">Active exceptions</div>
+          <p style="color:var(--mu); font-size:12px; margin:0 0 12px;">Open calibration and production-use issues grouped by type and severity.</p>
+          <table>
+            <thead><tr><th>Alert Type</th><th>Severity</th><th>Active Count</th><th>Frequency</th></tr></thead>
+            <tbody>
+              ${(m.alerts || []).map(a => `<tr>
+                <td><b>${a.alert_type}</b></td>
+                <td><span class="tag ${a.severity}">${a.severity}</span></td>
+                <td>${a.n}</td>
+                <td><div style="background:var(--ac); height:8px; border-radius:4px; width:${Math.min(300, 300*a.n/maxAlert)}px;"></div></td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    // ---------- TAB 2: OPERATOR PORTAL ----------
+    async function renderOperator(id = '') {
+      $('#app').innerHTML = `
+        <div class="card">
+          <div style="font-size:16px; font-weight:700; margin-bottom:10px;">🏭 Plant Operator: Production-Use Verification &amp; Interlock</div>
+          <p style="color:var(--mu);">Scan instrument barcode before attaching to production equipment. Backend verifies calibration, certificates, downtime, and releases.</p>
+          <div class="row">
+            <input id="op-iid" placeholder="Instrument ID (e.g. INS-000001)" value="${id}" style="width:200px;">
+            <input id="op-po" placeholder="Production Order / Batch" value="PO-2026-LINE1" style="width:180px;">
+            <button class="btn btn-success" onclick="runCheck()">⚡ Verify Eligibility &amp; Record Use</button>
+          </div>
+          <div class="row" style="margin-top:6px;">
+            <span style="color:var(--muted); font-size:12px;">Quick Scenarios:</span>
+            <button class="btn btn-ghost btn-sm" onclick="loadScenario('INS-000001')">Compliant Instrument</button>
+            <button class="btn btn-ghost btn-sm" onclick="loadScenario('OVERDUE')">Overdue Instrument</button>
+            <button class="btn btn-ghost btn-sm" onclick="loadScenario('WRONG_CERT')">Wrong-Asset Cert</button>
+          </div>
+          <div id="op-result"></div>
+        </div>
+
+        <div class="card">
+          <div style="font-size:15px; font-weight:700; margin-bottom:10px;">🛡 Intercepted Blocked Usage Attempts (Traceability Log)</div>
+          <p style="color:var(--mu); font-size:12px;">Blocked attempts are captured in <code>usage_attempt</code> without contaminating production consumption records.</p>
+          <div id="op-attempts-table"></div>
+        </div>
+      `;
+      loadRecentAttempts();
+    }
+
+    async function loadScenario(type) {
+      if (type === 'INS-000001') { $('#op-iid').value = 'INS-000001'; runCheck(); return; }
+      const insts = await api('/api/instruments?status=' + (type === 'OVERDUE' ? 'EXPIRED_USE' : 'WRONG_ASSET_CERT_USE') + '&limit=1');
+      if (insts && insts.length) { $('#op-iid').value = insts[0].instrument_id; runCheck(); }
+      else alert('No matching instrument found in current registry view.');
+    }
+
+    async function runCheck() {
+      const iid = $('#op-iid').value.trim();
+      const po = $('#op-po').value.trim();
+      if (!iid) return alert('Please enter an Instrument ID');
+
+      const res = await api('/api/check', { body: { instrument_id: iid, production_order_id: po } });
+      const container = $('#op-result');
+      if (res.error) {
+        container.innerHTML = `<div class="banner BLOCK"><div style="font-size:32px;">REJECTED</div><div class="sub">${res.error}</div></div>`;
+        return;
+      }
+
+      const dec = res.decision;
+      const title = dec === 'ALLOW' ? 'ALLOWED' : dec === 'BLOCK' ? 'BLOCKED' : 'ALLOWED (WITH EXCEPTION)';
+      const sub = res.reason || 'Decision derived from centralized policy POL-CAL-2026.1';
+      const recordNote = res.recorded_in_production
+        ? '✅ Genuine production use recorded in <code>production_use</code> (Batch ' + po + ')'
+        : '🛑 Prohibited use prevented! Logged in <code>usage_attempt</code> (Zero production contamination)';
+
+      container.innerHTML = `
+        <div class="banner ${dec}">
+          <div>${title}</div>
+          <div class="sub">${sub}</div>
+        </div>
+        <div style="background:var(--card); padding:12px; border-radius:6px; font-size:13px; border:1px solid var(--border);">
+          <div>${recordNote}</div>
+          <div style="color:var(--mu); font-size:12px; margin-top:6px;">
+            ID: <b>${res.use_id || res.attempt_id}</b> · Issue Type: <b>${res.issue_type || 'NONE'}</b> · Extension Ref: <b>${res.extension_id || 'NONE'}</b>
+          </div>
+        </div>
+      `;
+      loadRecentAttempts();
+    }
+
+    async function loadRecentAttempts() {
+      const attempts = await api('/api/attempts');
+      $('#op-attempts-table').innerHTML = tbl(
+        attempts.slice(0, 10),
+        ['attempt_id', 'instrument_id', 'operator_id', 'attempt_timestamp', 'decision', 'issue_type', 'reason'],
+        ['Attempt ID', 'Instrument', 'Operator', 'Timestamp', 'Decision', 'Issue Code', 'Rejection Reason']
+      );
+    }
+
+    // ---------- TAB 3: QUALITY & RELEASE PORTAL ----------
+    async function renderQuality() {
+      $('#app').innerHTML = `
+        <div class="grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="card">
+            <div style="font-size:16px; font-weight:700; margin-bottom:10px;">🔬 Record Calibration Event</div>
+            <p style="color:var(--mu); font-size:12px;">Only <b>QUALITY_ENGINEER</b> or <b>PLANT_MANAGER</b> may record calibration. Fails trigger quarantine &amp; impact assessment.</p>
+            <div class="row">
+              <input id="cal-iid" placeholder="Instrument ID (e.g. INS-000001)">
+              <select id="cal-res"><option value="PASS">PASS (Recalibration)</option><option value="FAIL">FAIL (Out of Tolerance)</option></select>
+            </div>
+            <div class="row">
+              <input id="cal-err" placeholder="Measured error % (optional)" type="number" step="0.01" style="width:180px;">
+              <button class="btn" onclick="submitCalibration()">Record Calibration</button>
+            </div>
+            <pre id="cal-out" style="display:none;"></pre>
+          </div>
+
+          <div class="card" style="border-left:1px solid var(--border);">
+            <div style="font-size:16px; font-weight:700; margin-bottom:10px;">✍️ Authorized Quality Release Sign-Off</div>
+            <p style="color:var(--mu); font-size:12px;">An instrument recalibrated with PASS enters <b>PENDING_RELEASE</b>. An authorized Quality Engineer must formally verify and release it.</p>
+            <div class="row">
+              <input id="rel-iid" placeholder="Instrument ID to Release">
+              <button class="btn btn-success" onclick="submitRelease()">Sign Off &amp; Release to ACTIVE</button>
+            </div>
+            <pre id="rel-out" style="display:none;"></pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="font-size:15px; font-weight:700; margin-bottom:10px;">Quarantined &amp; Pending Release Instruments</div>
+          <div id="quality-quarantine-table"></div>
+        </div>
+      `;
+      loadQuarantineList();
+    }
+
+    async function submitCalibration() {
+      const iid = $('#cal-iid').value.trim();
+      const res = $('#cal-res').value;
+      const err = $('#cal-err').value;
+      if (!iid) return alert('Enter Instrument ID');
+
+      const body = { instrument_id: iid, result: res };
+      if (err) body.error_pct = parseFloat(err);
+
+      const r = await api('/api/calibration', { body });
+      const pre = $('#cal-out');
+      pre.style.display = 'block';
+      pre.textContent = JSON.stringify(r, null, 2);
+      loadQuarantineList();
+    }
+
+    async function submitRelease() {
+      const iid = $('#rel-iid').value.trim();
+      if (!iid) return alert('Enter Instrument ID to release');
+
+      const r = await api('/api/instruments/' + iid + '/release', { method: 'POST', body: {} });
+      const pre = $('#rel-out');
+      pre.style.display = 'block';
+      pre.textContent = JSON.stringify(r, null, 2);
+      loadQuarantineList();
+    }
+
+    async function loadQuarantineList() {
+      const insts = await api('/api/instruments?limit=200');
+      const filtered = insts.filter(i => i.status === 'QUARANTINED_USE' || i.status === 'PENDING_RELEASE_USE');
+      $('#quality-quarantine-table').innerHTML = filtered.length
+        ? tbl(filtered, ['instrument_id', 'asset_id', 'status', 'next_due', 'reason'])
+        : '<p style="color:var(--mu);">No instruments currently in quarantine or pending release.</p>';
+    }
+
+    // ---------- TAB 4: PLANNER PORTAL ----------
+    async function renderPlanner() {
+      const m = await api('/api/metrics');
+      const wos = await api('/api/workorders');
+      $('#app').innerHTML = `
+        <div class="card">
+          <div style="font-size:16px; font-weight:700; margin-bottom:10px;">📋 Production Planner: Asset Availability &amp; Downtime</div>
+          <p style="color:var(--mu);">Monitor equipment readiness, open corrective work orders, and scheduled calibration downtime.</p>
+        </div>
+        <div class="card">
+          <div style="font-size:15px; font-weight:700; margin-bottom:10px;">Active Corrective Actions &amp; Maintenance Downtime</div>
+          ${tbl(wos.slice(0, 15), ['work_order_id', 'instrument_id', 'priority', 'opened_date', 'status', 'source_calibration_id', 'closure_calibration_id'], ['Work Order ID', 'Instrument', 'Priority', 'Opened Date', 'Status', 'Failure Cal ID', 'Recalibration Cal ID'])}
+        </div>
+      `;
+    }
+
+    // ---------- TAB 5: CERTIFICATE VAULT ----------
+    async function renderCertificates() {
+      const wos = await api('/api/workorders');
+      $('#app').innerHTML = `
+        <div class="card">
+          <div style="font-size:16px; font-weight:700; margin-bottom:10px;">📜 Calibration Certificate Vault &amp; Traceability</div>
+          <p style="color:var(--mu);">All certificates cross-checked for matching instrument ID, matching asset ID, valid dates, and required measurement range coverage.</p>
+          <div class="row">
+            <input id="cert-filter" placeholder="Filter by instrument or certificate #">
+            <button class="btn" onclick="filterCerts()">Search</button>
+          </div>
+          <div id="cert-table-container"></div>
+        </div>
+      `;
+      loadCerts();
+    }
+
+    async function loadCerts() {
+      const data = await api('/api/audit?id=CERT-');
+      $('#cert-table-container').innerHTML = tbl(
+        data.slice(-25).reverse(),
+        ['event_ts', 'entity_id', 'action', 'actor', 'old_state', 'new_state', 'reason'],
+        ['Timestamp', 'Certificate ID', 'Action', 'Issuer', 'Old Status', 'New Status', 'Verification Notes']
+      );
+    }
+
+    function filterCerts() { loadCerts(); }
+
+    // ---------- TAB 6: EXCEPTION CENTRE ----------
+    async function renderExceptions() {
+      const excs = await api('/api/exceptions');
+      $('#app').innerHTML = `
+        <div class="card">
+          <div style="font-size:16px; font-weight:700; margin-bottom:10px;">⚠️ Exception Centre: Active Quality Alerts</div>
+          <p style="color:var(--mu);">Detected policy violations, overdue events, wrong certificates, and unassessed failure alerts.</p>
+          ${tbl(excs.slice(0, 30), ['alert_id', 'severity', 'alert_type', 'entity_id', 'instrument_id', 'created_at', 'message', 'status'])}
+        </div>
+      `;
+    }
+
+    // ---------- TAB 7: WORK ORDERS & IMPACT ----------
+    async function renderWorkOrders() {
+      const wos = await api('/api/workorders');
+      const ias = await api('/api/impact');
+      $('#app').innerHTML = `
+        <div class="card">
+          <div style="font-size:16px; font-weight:700; margin-bottom:10px;">Impact Assessments (Batches Affected by Failed Calibrations)</div>
+          ${tbl(ias.slice(0, 15), ['ia_id', 'instrument_id', 'window_start', 'window_end', 'affected_use_count', 'affected_order_count', 'status', 'assessed_by'], ['Assessment ID', 'Instrument', 'Window Start', 'Window End', 'Affected Uses', 'Affected Orders', 'Status', 'Assessed By'])}
+        </div>
+        <div class="card">
+          <div style="font-size:16px; font-weight:700; margin-bottom:10px;">Corrective Work Orders</div>
+          ${tbl(wos.slice(0, 15), ['work_order_id', 'instrument_id', 'priority', 'opened_date', 'status', 'source_calibration_id', 'closure_calibration_id'])}
+        </div>
+      `;
+    }
+
+    // ---------- TAB 8: AUDIT TRAIL ----------
+    async function renderAudit() {
+      $('#app').innerHTML = `
+        <div class="card">
+          <div style="font-size:16px; font-weight:700; margin-bottom:10px;">🔍 Immutable Audit Trail &amp; Forensic Trace</div>
+          <p style="color:var(--mu);">Protected by physical database triggers: <code>audit_no_update</code> and <code>audit_no_delete</code>. Every state change is immutable.</p>
+          <div class="row">
+            <input id="aud-id" placeholder="Instrument ID (e.g. INS-000001)" value="INS-000001" style="width:220px;">
+            <button class="btn" onclick="traceAudit()">Trace Full History</button>
+          </div>
+          <div id="aud-table-container"></div>
+        </div>
+      `;
+      traceAudit();
+    }
+
+    async function traceAudit() {
+      const id = $('#aud-id').value.trim();
+      const rows = await api('/api/audit?id=' + encodeURIComponent(id));
+      $('#aud-table-container').innerHTML = rows.length
+        ? tbl(rows, ['event_ts', 'entity_type', 'entity_id', 'action', 'actor', 'old_state', 'new_state', 'reason'])
+        : '<p style="color:var(--mu);">No audit history found for ' + id + '</p>';
+    }
+
+    // ---------- TAB 9: ADVANCED SQL & ANALYTICS ----------
+    async function renderAnalytics() {
+      $('#app').innerHTML = `
+        <div class="card">
+          <div style="font-size:16px; font-weight:700; margin-bottom:6px;">📈 Advanced Industrial SQL &amp; Analytical Queries</div>
+          <p style="color:var(--mu); font-size:12px;">Demonstrating Window Functions (ROW_NUMBER PARTITION), Common Table Expressions (CTEs), Single-Pass Conditional Aggregations, and SARGABLE indexed date searches.</p>
+        </div>
+
+        <div class="grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="card">
+            <div style="font-size:14px; font-weight:700; margin-bottom:8px;">⏳ CTE: Upcoming Calibration Deadlines (Next 30 Days)</div>
+            <p style="color:var(--mu); font-size:11px;">Calculated dynamically from simulation date using Common Table Expression.</p>
+            <div id="analytics-deadlines">Loading...</div>
+          </div>
+
+          <div class="card">
+            <div style="font-size:14px; font-weight:700; margin-bottom:8px;">🏭 Supplier Performance &amp; Failure Rates</div>
+            <p style="color:var(--mu); font-size:11px;">Aggregated pass rate % and average as-found error across accredited calibration labs.</p>
+            <div id="analytics-suppliers">Loading...</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="font-size:14px; font-weight:700; margin-bottom:8px;">🪟 Window Function: Latest Calibration per Instrument (ROW_NUMBER OVER PARTITION)</div>
+          <p style="color:var(--mu); font-size:11px;">Extracts the most recent calibration event for all instruments in a single database pass without N+1 query overhead.</p>
+          <div id="analytics-window">Loading...</div>
+        </div>
+      `;
+
+      // Load analytics data
+      const [deadlines, suppliers, latestCals] = await Promise.all([
+        api('/api/analytics/upcoming-deadlines?days=30'),
+        api('/api/analytics/supplier-performance'),
+        api('/api/analytics/latest-calibrations?limit=15')
+      ]);
+
+      $('#analytics-deadlines').innerHTML = deadlines.length
+        ? tbl(deadlines.slice(0, 10), ['instrument_id', 'asset_id', 'type_name', 'next_due_date', 'days_remaining'], ['Instrument', 'Asset', 'Type', 'Due Date', 'Days Left'])
+        : '<p style="color:var(--mu); font-size:12px;">No calibration deadlines approaching within 30 days of simulation date.</p>';
+
+      $('#analytics-suppliers').innerHTML = tbl(
+        suppliers,
+        ['name', 'country', 'total_calibrations', 'passed', 'failed', 'pass_percentage', 'avg_as_found_error'],
+        ['Supplier Lab', 'Country', 'Total Cals', 'Pass', 'Fail', 'Pass Rate %', 'Avg Error %']
+      );
+
+      $('#analytics-window').innerHTML = tbl(
+        latestCals,
+        ['instrument_id', 'calibration_id', 'calibration_date', 'result', 'as_found_error_pct', 'tolerance_pct', 'next_due_date'],
+        ['Instrument', 'Latest Calibration ID', 'Date', 'Outcome', 'Error %', 'Tolerance %', 'Next Due Date']
+      );
+    }
+
+    // Initialize application
+    initAuth().then(() => go('📊 Executive'));
+  </script>
+</body>
+</html>

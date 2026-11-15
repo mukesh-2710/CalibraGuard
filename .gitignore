@@ -1,0 +1,31 @@
+# Generated datasets, reports, and local SQLite databases
+/out/
+*.db
+*.sqlite
+*.sqlite3
+
+# Python bytecode and test/type-check caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments and local environment files
+.venv/
+venv/
+env/
+.env
+.env.*
+!.env.example
+
+# Build and editor/OS artifacts
+build/
+dist/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
